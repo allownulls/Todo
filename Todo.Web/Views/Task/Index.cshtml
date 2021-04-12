@@ -1,0 +1,129 @@
+﻿@using Todo.Model
+@model ListModel
+
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                @Model.Name
+                <input type="hidden" id="headerId" value="@Model.Id">
+            </th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        @foreach (var item in Model.Tasks)
+        {
+            <tr id="row-@item.Id">
+                <td>
+                    <input type="checkbox" class="form-check-input cbTask" checked="@item.Checked" data-id="@item.Id">
+                </td>
+                <td id="text-@item.Id">
+                    @item.Description
+                </td>
+                <td>
+                    <button class="delTodoTask" data-id="@item.Id">Del</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>
+                <input id="newTask" type="text" />
+            </td>
+
+            <td>
+                <button id="addTodoTask">Add</button>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+@section Styles{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icheck-bootstrap/3.0.1/icheck-bootstrap.min.css" />    
+}
+
+@section scripts
+{
+    <script>
+        $(function () {
+            $('#addTodoTask').click(addTask);
+            $('.delTodoTask').click(function () { delTask($(this).data('id')); });
+
+            $('.cbTask').each(function () {
+                var checked = $(this).prop("checked");
+                var id = $(this).data('id');
+
+                if (checked) {
+                    $('#text-' + id).addClass('strikethrough');
+                } else {
+                    $('#text-' + id).removeClass('strikethrough');
+                }
+            })
+
+            $('.cbTask').change(function () { updateTask($(this).data('id'), $(this).prop("checked")) });
+        });
+
+        var updateTask = function (id, checked) {
+
+            var data = JSON.stringify({ id: id, checked: checked });
+
+            $.ajax({
+                type: "POST",
+                url: "/Task/UpdateTask",
+                contentType: "application/json",
+                data: data,
+                success: function (data) {
+                    if (data.checked) {
+                        $('#text-' + data.id).addClass('strikethrough');
+                    } else {
+                        $('#text-' + data.id).removeClass('strikethrough');
+                    }
+                },
+                error: function () {
+                    alert("task update error");
+                }
+            });
+        }
+
+        var addTask = function () {
+
+            var task = $('#newTask').val();
+            var hId = $('#headerId').val();
+            var data = JSON.stringify({ Description: task, HeaderId: hId });
+
+            $.ajax({
+                type: "POST",
+                url: "/Task/AddTask",
+                contentType: "application/json",
+                data: data,
+                success: function (data) {
+                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><input type='checkbox' class='cbTask' data-id='" + data.id + "'></td><td id='text-" + data.id + "'>" + data.description + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delList($(this).data('id'));'>Del</button></td></tr>"));
+                    $('.cbTask').change(function () { updateTask($(this).data('id'), $(this).prop("checked")) });
+                    $('#newTask').val('');
+                },
+                error: function () {
+                    alert("add task error");
+                }
+            });
+        };
+
+        var delTask = function (id) {
+
+            var data = { id: id };
+
+            $.ajax({
+                type: "POST",
+                url: "/Task/DeleteTask?" + $.param(data),
+                success: function (data) {
+                    $('#row-' + id).remove();
+                },
+                error: function () {
+                    alert("add list error");
+                }
+            });
+        };
+
+    </script>
+}

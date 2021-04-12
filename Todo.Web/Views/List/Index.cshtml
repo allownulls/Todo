@@ -1,0 +1,82 @@
+﻿@using Todo.Model
+@model List<ListModel>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                Your todo lists:
+            </th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+    @foreach (var item in Model)
+    {
+        <tr id="row-@item.Id">
+            <td>
+                <a href="@Url.Action("Index", "Task", new { id = item.Id })">@item.Name</a>
+            </td>
+            <td>
+                <button class="delTodoList" data-id="@item.Id">Del</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+    <tr>
+        <td>
+            <input id="newName" type="text" />
+        </td>
+
+        <td>
+            <button id="addTodoList">Add</button>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+
+@section scripts
+{
+    <script>
+        $(function () {
+            $('#addTodoList').click(addList);
+            $('.delTodoList').click(function () { delList($(this).data('id')); });
+        });
+
+        var addList = function () {
+
+            var listName = $('#newName').val();
+            var data = { name: listName };
+
+            $.ajax({
+                type: "POST",
+                url: "/List/AddList?" + $.param(data),
+                success: function (data) {
+                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><a href='/Task/Index?id=" + data.id + "'>" + data.name + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delList($(this).data(&quot;id&quot;));'>Del</button></td></tr>"));
+                    $('#newName').val('');
+                },
+                error: function () {
+                    alert("add list error");
+                }
+            });
+        };
+
+        var delList = function (id) {
+
+            var data = { id: id };
+
+            $.ajax({
+                type: "POST",
+                url: "/List/DeleteList?" + $.param(data),
+                success: function (data) {
+                    $('#row-' + id).remove();
+                },
+                error: function () {
+                    alert("delete list error");
+                }
+            });
+        };
+
+    </script>
+}
