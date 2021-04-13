@@ -99,7 +99,7 @@
                 contentType: "application/json",
                 data: data,
                 success: function (data) {
-                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><input type='checkbox' class='cbTask' data-id='" + data.id + "'></td><td id='text-" + data.id + "'>" + data.description + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delList($(this).data('id'));'>Del</button></td></tr>"));
+                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><input type='checkbox' class='cbTask' data-id='" + data.id + "'></td><td id='text-" + data.id + "'>" + data.description + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delTask($(this).data(&quot;id&quot;));'>Del</button></td></tr>"));
                     $('.cbTask').change(function () { updateTask($(this).data('id'), $(this).prop("checked")) });
                     $('#newTask').val('');
                 },
