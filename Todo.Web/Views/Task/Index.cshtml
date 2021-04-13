@@ -1,7 +1,6 @@
 ﻿@using Todo.Model
 @model ListModel
 
-
 <table>
     <thead>
         <tr>
@@ -14,17 +13,20 @@
     <tbody id="tableBody">
         @foreach (var item in Model.Tasks)
         {
-            <tr id="row-@item.Id">
-                <td>
-                    <input type="checkbox" class="form-check-input cbTask" checked="@item.Checked" data-id="@item.Id">
-                </td>
-                <td id="text-@item.Id">
-                    @item.Description
-                </td>
-                <td>
-                    <button class="delTodoTask" data-id="@item.Id">Del</button>
-                </td>
-            </tr>
+        <tr id="row-@item.Id">
+            <td>
+                <input type="checkbox" class="form-check-input cbTask" checked="@item.Checked" data-id="@item.Id">
+            </td>
+            <td id="text-@item.Id">
+                @item.Description
+            </td>
+            <td>
+                @item.LastUpdated
+            </td>
+            <td>
+                <button class="delTodoTask" data-id="@item.Id">Del</button>
+            </td>
+        </tr>
         }
     </tbody>
     <tfoot>
@@ -32,7 +34,6 @@
             <td>
                 <input id="newTask" type="text" />
             </td>
-
             <td>
                 <button id="addTodoTask">Add</button>
             </td>
@@ -99,7 +100,7 @@
                 contentType: "application/json",
                 data: data,
                 success: function (data) {
-                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><input type='checkbox' class='cbTask' data-id='" + data.id + "'></td><td id='text-" + data.id + "'>" + data.description + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delTask($(this).data(&quot;id&quot;));'>Del</button></td></tr>"));
+                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><input type='checkbox' class='form-check-input cbTask' data-id='" + data.id + "'></td><td id='text-" + data.id + "'>" + data.description + "</td><td>" + formatDate(data.lastUpdated) + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delTask($(this).data(&quot;id&quot;));'>Del</button></td></tr>"));
                     $('.cbTask').change(function () { updateTask($(this).data('id'), $(this).prop("checked")) });
                     $('#newTask').val('');
                 },
@@ -125,5 +126,29 @@
             });
         };
 
+        var formatDate = function (date) {
+            var d = new Date(date);
+
+            var currDay = d.getDate();
+            var currMonth = d.getMonth();
+            var currYear = d.getFullYear();
+
+            var currHour = d.getHours();
+            var currMin = d.getMinutes();
+            var currSec = d.getSeconds();
+
+            var month = currMonth + 1;
+
+            var ampm = currHour >= 12 ? 'PM' : 'AM';
+            var hours = currHour % 12;
+            hours = hours ? hours : 12;
+            
+            var minutes = currMin < 10 ? '0' + currMin : currMin;
+            var seconds = currSec < 10 ? '0' + currSec : currSec;
+                                
+            var strDate = currDay + "/" + month + "/" + currYear + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+
+            return strDate;
+        }
     </script>
 }

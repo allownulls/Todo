@@ -1,19 +1,11 @@
-﻿using Todo.Model.AccountViewModels;
-using Todo.Model;
-using Todo.Services;
-using Microsoft.AspNetCore.Authentication;
-using Todo.Data;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
+
 using System.Threading.Tasks;
+
+using Todo.Model.AccountViewModels;
 
 namespace Todo.Web.Controllers
 {

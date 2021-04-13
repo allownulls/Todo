@@ -1,22 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Todo.Core;
 using Todo.Model;
-using Todo.Services;
-using Microsoft.AspNetCore.Authentication;
-using Todo.Data;
-using Microsoft.AspNetCore.Authorization;
+
 
 namespace Todo.Controllers
 {
     [Authorize]
     public class TaskController : Controller
     {
-        ITaskService _taskService;
-        IListService _listService;
+        private readonly ITaskService _taskService;
+        private readonly IListService _listService;
 
         public TaskController(ITaskService taskService,
                               IListService listService)

@@ -1,22 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Todo.Core;
-using Todo.Services;
-using Todo.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Todo.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Todo.Core;
+using Todo.Model;
 
 namespace Todo.Controllers
 {
     [Authorize]
     public class ListController : Controller
     {
-        protected IListService _listService;
+        private readonly IListService _listService;
         private readonly UserManager<IdentityUser> _userManager;
 
         public ListController(IListService listService, UserManager<IdentityUser> userManager)
