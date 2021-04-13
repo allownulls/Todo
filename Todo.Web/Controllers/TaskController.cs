@@ -26,6 +26,9 @@ namespace Todo.Controllers
         {
             var model = await _listService.GetList(id);
 
+            if (model == null)
+                return RedirectToAction("Index", "Home");
+
             return View(model);
         }
 

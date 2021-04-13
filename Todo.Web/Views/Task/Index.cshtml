@@ -1,48 +1,57 @@
 ﻿@using Todo.Model
 @model ListModel
 
-<table>
-    <thead>
-        <tr>
-            <th>
-                @Model.Name
-                <input type="hidden" id="headerId" value="@Model.Id">
-            </th>
-        </tr>
-    </thead>
-    <tbody id="tableBody">
-        @foreach (var item in Model.Tasks)
-        {
-        <tr id="row-@item.Id">
-            <td>
-                <input type="checkbox" class="form-check-input cbTask" checked="@item.Checked" data-id="@item.Id">
-            </td>
-            <td id="text-@item.Id">
-                @item.Description
-            </td>
-            <td>
-                @item.LastUpdated
-            </td>
-            <td>
-                <button class="delTodoTask" data-id="@item.Id">Del</button>
-            </td>
-        </tr>
-        }
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>
-                <input id="newTask" type="text" />
-            </td>
-            <td>
-                <button id="addTodoTask">Add</button>
-            </td>
-        </tr>
-    </tfoot>
-</table>
-
+<div class="col-md-6">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th colspan=5>
+                    @Model.Name
+                    <input type="hidden" id="headerId" value="@Model.Id">
+                </th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            @foreach (var item in Model.Tasks)
+            {
+            <tr id="row-@item.Id">
+                <td class="w-10">
+                    <div class="icheck-default">
+                        <input type="checkbox" id="chk-@item.Id" class="form-check-input cbTask" checked="@item.Checked" data-id="@item.Id">
+                        <label for="chk-@item.Id"></label>
+                    </div>
+                </td>
+                <td id="text-@item.Id">
+                    @item.Description
+                </td>
+                <td class="date-field" id="date-@item.Id">
+                    @item.LastUpdated
+                </td>
+                <td>                    
+                    <button class="btn btn-outline-dark delTodoTask" data-id="@item.Id"><i class="bi-trash"></i></button>                    
+                </td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <div class="form-group">
+                        <input id="newTask" class="form-control" type="text" />
+                    </div>
+                </td>
+                <td>&nbsp;</td>
+                <td>
+                    <button class="btn btn-outline-dark" id="addTodoTask"><i class="bi-plus"></i></button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 @section Styles{
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icheck-bootstrap/3.0.1/icheck-bootstrap.min.css" />    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 }
 
 @section scripts
@@ -64,6 +73,12 @@
             })
 
             $('.cbTask').change(function () { updateTask($(this).data('id'), $(this).prop("checked")) });
+
+            $("#newTask").keyup(function (event) {
+                if (event.keyCode === 13) {
+                    $("#addTodoTask").click();
+                }
+            });
         });
 
         var updateTask = function (id, checked) {
@@ -81,6 +96,7 @@
                     } else {
                         $('#text-' + data.id).removeClass('strikethrough');
                     }
+                    $('#date-' + data.id).text(formatDate(data.lastUpdated))
                 },
                 error: function () {
                     alert("task update error");
@@ -100,7 +116,8 @@
                 contentType: "application/json",
                 data: data,
                 success: function (data) {
-                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><input type='checkbox' class='form-check-input cbTask' data-id='" + data.id + "'></td><td id='text-" + data.id + "'>" + data.description + "</td><td>" + formatDate(data.lastUpdated) + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delTask($(this).data(&quot;id&quot;));'>Del</button></td></tr>"));
+                    if (!data.description) { data.description = ''; }
+                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><div class='icheck-default'><input type='checkbox' id='chk-" + data.id + "' class='form-check-input cbTask' data-id='" + data.id + "'><label for='chk-" + data.id + "'></label></div></td><td id='text-" + data.id + "'>" + data.description + "</td><td id='date-" + data.id + "'>" + formatDate(data.lastUpdated) + "</td><td> <button class='btn btn-outline-dark delTodoList' data-id='" + data.id + "' onclick='delTask($(this).data(&quot;id&quot;));'><i class='bi-trash'></i></button></td></tr>"));
                     $('.cbTask').change(function () { updateTask($(this).data('id'), $(this).prop("checked")) });
                     $('#newTask').val('');
                 },
@@ -142,10 +159,10 @@
             var ampm = currHour >= 12 ? 'PM' : 'AM';
             var hours = currHour % 12;
             hours = hours ? hours : 12;
-            
+
             var minutes = currMin < 10 ? '0' + currMin : currMin;
             var seconds = currSec < 10 ? '0' + currSec : currSec;
-                                
+
             var strDate = currDay + "/" + month + "/" + currYear + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
 
             return strDate;

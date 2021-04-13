@@ -73,3 +73,11 @@ body {
 .strikethrough {
     text-decoration: line-through;
 }
+
+.w-10 {
+    width:10px;
+}
+
+.date-field {
+    width:180px;
+}

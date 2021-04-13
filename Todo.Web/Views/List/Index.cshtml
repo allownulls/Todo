@@ -2,39 +2,52 @@
 @model List<ListModel>
 
 
-<table>
-    <thead>
-        <tr>
-            <th>
-                Your todo lists:
-            </th>
-        </tr>
-    </thead>
-    <tbody id="tableBody">
-    @foreach (var item in Model)
-    {
-        <tr id="row-@item.Id">
-            <td>
-                <a href="@Url.Action("Index", "Task", new { id = item.Id })">@item.Name</a>
-            </td>
-            <td>
-                <button class="delTodoList" data-id="@item.Id">Del</button>
-            </td>
-        </tr>
-    }
-    </tbody>
-    <tfoot>
-    <tr>
-        <td>
-            <input id="newName" type="text" />
-        </td>
+<div class="col-md-6">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th colspan="3">
+                    Your todo lists:
+                </th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            @foreach (var item in Model)
+            {
+            <tr id="row-@item.Id">
+                <td>
+                    <a href="@Url.Action("Index", "Task", new { id = item.Id })" class="btn btn-outline-dark" data-id="@item.Id"><i class="bi-list"></i></a>
+                </td>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    <button class="btn btn-outline-dark delTodoList" data-id="@item.Id"><i class="bi-trash"></i></button>
+                </td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <div class="form-group">
+                        <input class="form-control" id="newName" type="text" />
+                    </div>
+                </td>
 
-        <td>
-            <button id="addTodoList">Add</button>
-        </td>
-    </tr>
-    </tfoot>
-</table>
+                <td>
+                    <button class="btn btn-outline-dark" id="addTodoList"><i class="bi-plus"></i></button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@section Styles{
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+}
+
 
 @section scripts
 {
@@ -42,6 +55,12 @@
         $(function () {
             $('#addTodoList').click(addList);
             $('.delTodoList').click(function () { delList($(this).data('id')); });
+            $("#newName").keyup(function (event) {
+                if (event.keyCode === 13) {
+                    $("#addTodoList").click();
+                }
+            });
+
         });
 
         var addList = function () {
@@ -53,7 +72,8 @@
                 type: "POST",
                 url: "/List/AddList?" + $.param(data),
                 success: function (data) {
-                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><a href='/Task/Index?id=" + data.id + "'>" + data.name + "</td><td> <button class='delTodoList' data-id='" + data.id + "' onclick='delList($(this).data(&quot;id&quot;));'>Del</button></td></tr>"));
+                    if (!data.name) { data.name = ''; }
+                    $('#tableBody').append($("<tr id='row-" + data.id + "'><td><a href='/Task/Index?id=" + data.id + "' class='btn btn-outline-dark' data-id='" + data.id + "'><i class='bi-list'></i></a></td><td>" + data.name + "</td><td><button class='btn btn-outline-dark delTodoList' data-id='" + data.id + "' onclick='delList($(this).data(&quot;id&quot;));'><i class='bi-trash'></i></button></td></tr>"));
                     $('#newName').val('');
                 },
                 error: function () {

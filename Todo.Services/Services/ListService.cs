@@ -21,7 +21,7 @@ namespace Todo.Services
         }
         public async Task<IEnumerable<ListModel>> GetLists(string userId)
         {
-            return _db.TodoHeaders.Any() ?
+            return _db.TodoHeaders.Any(e => e.OwnerId == userId) ?
                              await _db.TodoHeaders.Where(e => e.OwnerId == userId)
                                                   .Select(e => new ListModel() {
                                                              Id = e.Id,
@@ -35,24 +35,29 @@ namespace Todo.Services
         {
             var th = await _db.TodoHeaders
                               .Include(e => e.Lines)
-                              .SingleAsync(e => e.Id == id);
+                              .SingleOrDefaultAsync(e => e.Id == id);
 
-            return new ListModel()
+            if (th != null)
             {
-                Id = th.Id,
-                Name = th.Name,
-                OwnerId = th.OwnerId,
-                Tasks = th.Lines.Select(e => new TaskModel()
+                return new ListModel()
                 {
-                    Id = e.Id,
-                    HeaderId = e.Header.Id,
-                    Description = e.Description,
-                    LastUpdated = e.LastUpdated,
-                    Name = e.Name,
-                    Checked = e.Checked
-                })                                      
-                .ToList()
-            };
+                    Id = th.Id,
+                    Name = th.Name,
+                    OwnerId = th.OwnerId,
+                    Tasks = th.Lines.Select(e => new TaskModel()
+                    {
+                        Id = e.Id,
+                        HeaderId = e.Header.Id,
+                        Description = e.Description,
+                        LastUpdated = e.LastUpdated,
+                        Name = e.Name,
+                        Checked = e.Checked
+                    })
+                    .ToList()
+                };
+            }
+
+            return null;
         }
 
         public async Task<ListModel> AddList(ListModel listModel)
