@@ -1,5 +1,8 @@
 # Todo list application.
 
+Default user: abc@xyz.com
+Password: Qwe123%
+
 With an application like this, the first thing to decide is a storage DB. I picked SQL just because of the tight timeframe. If there was more time, I'd go with some document database.
 
 MongoDB fits this task almost perfectly.
