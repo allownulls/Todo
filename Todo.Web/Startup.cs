@@ -7,6 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Azure;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Todo.Data;
 using Todo.Core;
 using Todo.Services;
@@ -25,6 +29,12 @@ namespace Todo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAzureClients(builder =>
+            {
+                builder.AddSecretClient(new System.Uri(Configuration.GetSection("KeyVaultName").Value));
+                builder.UseCredential(new DefaultAzureCredential());
+            });
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -38,7 +48,10 @@ namespace Todo
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<IdentityUser> userManager)
+        public void Configure(IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            UserManager<IdentityUser> userManager,
+            SecretClient secretClient)
         {
             if (env.IsDevelopment())
             {
